@@ -20,4 +20,7 @@
     <string name="show_as_list">Show as list</string>
     <string name="settings">Settings</string>
     <string name="send_to">Share with friends</string>
+    <string name="title_activity_tabbed_status">TabbedStatusActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

@@ -3,17 +3,20 @@ package com.mj.stalvarestatussaver
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.os.Parcelable
 import androidx.core.content.FileProvider
+import kotlinx.android.parcel.Parcelize
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 
+@Parcelize
 data class StatusData(
     val path: String,
     val modified: Long
 
-) {
+): Parcelable {
 
     private fun getExtension(): String {
         //returns extension including .

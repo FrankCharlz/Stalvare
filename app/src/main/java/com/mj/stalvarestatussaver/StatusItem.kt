@@ -32,10 +32,7 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
         var save: ImageView = view.findViewById(R.id.img_save)
         var share: ImageView = view.findViewById(R.id.img_share)
 
-
-
-        override fun unbindView(item: StatusItem) {
-
+        override fun bindView(item: StatusItem, payloads: List<Any>) {
             name.text = item.status.getDate()
             save.setOnClickListener {
                 saveStatus(it.context, item.status)
@@ -63,14 +60,13 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
                 return
             }
 
-
         }
 
 
-
-        override fun bindView(item: StatusItem, payloads: List<Any>) {
-
+        override fun unbindView(item: StatusItem) {
+            name.text = null
         }
+
 
         private fun shareStatus(context: Context, status: StatusData) {
 
