@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         mItemsAdapter = ItemAdapter<StatusItem>();
         mFastAdapter = FastAdapter.with(mItemsAdapter)
 
@@ -46,7 +45,6 @@ class MainActivity : AppCompatActivity() {
 
         val directory = File(path)
 
-        Timber.i("abs path: ${directory.absolutePath}")
 
         if (!directory.isDirectory)   {
             Toast.makeText(this, "$path is not a valid directory.", Toast.LENGTH_SHORT).show();
@@ -66,7 +64,6 @@ class MainActivity : AppCompatActivity() {
             .map { StatusItem(it) }
             .sortedByDescending { it.status.modified }
 
-        Timber.i("statuses: $statuses")
         mItemsAdapter.add(statuses)
 
     }

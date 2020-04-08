@@ -30,6 +30,7 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
         var name: TextView = view.findViewById(R.id.name)
         var image: ImageView = view.findViewById(R.id.imageView)
         var save: ImageView = view.findViewById(R.id.img_save)
+        var share: ImageView = view.findViewById(R.id.img_share)
 
 
 
@@ -38,6 +39,10 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
             name.text = item.status.getDate()
             save.setOnClickListener {
                 saveStatus(it.context, item.status)
+            }
+
+            share.setOnClickListener {
+                shareStatus(it.context, item.status)
             }
 
             if (item.status.isImage()) {
@@ -61,23 +66,31 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
 
         }
 
+
+
         override fun bindView(item: StatusItem, payloads: List<Any>) {
 
         }
 
+        private fun shareStatus(context: Context, status: StatusData) {
 
-        private fun saveStatus(
-            context: Context,
-            status: StatusData
-        ) {
+            val shareIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                setDataAndType(status.getUriToFile(context), status.getMimeType())
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(R.string.send_to)))
+        }
+
+        private fun saveStatus(context: Context, status: StatusData) {
 
             try {
                 val f = status.save()
                 Toast.makeText(context, "Status saved at ${f.absolutePath}", Toast.LENGTH_SHORT).show();
 
                 val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-                val contentUri: Uri = Uri.fromFile(f)
-                mediaScanIntent.data = contentUri
+                mediaScanIntent.data = status.getUriToFile(context)
                 context.sendBroadcast(mediaScanIntent)
 
 
