@@ -21,9 +21,6 @@ class TabbedStatusActivity : AppCompatActivity() {
     private lateinit var mStatuses: List<StatusItem>
     private lateinit var context: Context
 
-    val vm by lazy {
-        ViewModelProvider(this).get(StatusViewModel::class.java)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

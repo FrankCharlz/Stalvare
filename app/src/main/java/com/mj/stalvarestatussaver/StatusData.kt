@@ -68,4 +68,11 @@ data class StatusData(
         if (isVideo()) return "video/*"
         else return "image/*"
     }
+
+    companion object {
+
+        fun getBlankStatus(): StatusData {
+            return StatusData("", System.currentTimeMillis());
+        }
+    }
 }
