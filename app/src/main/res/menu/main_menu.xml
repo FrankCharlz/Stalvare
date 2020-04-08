@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/tabs"
+        android:icon="@drawable/tabs"
+        android:title="@string/show_as_tabs"
+        android:visible="true" />
+    <item
+        android:id="@+id/list"
+        android:icon="@drawable/tabs"
+        android:title="@string/show_as_list"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/tabs"
+        android:title="@string/settings"
+        android:visible="true" />
+</menu>
