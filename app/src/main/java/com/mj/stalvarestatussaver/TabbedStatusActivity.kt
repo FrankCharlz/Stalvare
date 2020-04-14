@@ -13,13 +13,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
-import com.mj.stalvarestatussaver.ui.main.StatusFragment
 import java.io.File
+import java.lang.Exception
 
 class TabbedStatusActivity : AppCompatActivity() {
 
-    private lateinit var mStatuses: List<StatusItem>
+    //private lateinit var vm.mStatuses: List<StatusItem>
     private lateinit var context: Context
+
+    val vm by lazy {
+        ViewModelProvider(this).get(SharedViewModel::class.java)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,9 +36,14 @@ class TabbedStatusActivity : AppCompatActivity() {
 
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        fab.setOnClickListener {
+            val status = vm.getCurrentStatus()
+            try {
+                val f = status.save()
+                Toast.makeText(it.context, "Status saved at ${f.absolutePath}", Toast.LENGTH_SHORT).show();
+            } catch (e: Exception) {
+                Toast.makeText(it.context, "Could not save status ${e.message}", Toast.LENGTH_SHORT).show();
+            }
         }
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
@@ -53,7 +62,7 @@ class TabbedStatusActivity : AppCompatActivity() {
         FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
-            return StatusFragment.newInstance(mStatuses[position].status)
+            return StatusFragment.newInstance(vm.mStatuses[position])
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
@@ -61,14 +70,14 @@ class TabbedStatusActivity : AppCompatActivity() {
         }
 
         override fun getCount(): Int {
-            return mStatuses.size
+            return vm.mStatuses.size
         }
     }
 
 
-    fun loadStatuses() {
+    private fun loadStatuses() {
 
-        val path = Environment.getExternalStorageDirectory()?.absolutePath + MainActivity.STATUS_FOLDER_PATH
+        val path = Environment.getExternalStorageDirectory()?.absolutePath + StatusData.STATUS_FOLDER_PATH
 
         val directory = File(path)
 
@@ -85,11 +94,11 @@ class TabbedStatusActivity : AppCompatActivity() {
             return
         }
 
-         mStatuses = files
+        vm.mStatuses.addAll( files
             .map { StatusData(it.absolutePath, it.lastModified()) }
             .filter { it.isStatus() }
-            .map { StatusItem(it) }
-            .sortedByDescending { it.status.modified }
+            .sortedByDescending { it.modified }
+        )
 
     }
 

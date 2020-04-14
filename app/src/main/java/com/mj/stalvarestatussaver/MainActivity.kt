@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadListOfFiles() {
 
 
-        val path = Environment.getExternalStorageDirectory()?.absolutePath + STATUS_FOLDER_PATH
+        val path = Environment.getExternalStorageDirectory()?.absolutePath + StatusData.STATUS_FOLDER_PATH
 
         val directory = File(path)
 
@@ -69,7 +69,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val STATUS_FOLDER_PATH: String = "/WhatsApp/Media/.Statuses/"
 
         @BindingAdapter("profileImage")
         fun loadImage(view: ImageView, profileImage: String) {

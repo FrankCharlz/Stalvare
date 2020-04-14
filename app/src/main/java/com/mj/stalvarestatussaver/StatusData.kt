@@ -38,6 +38,8 @@ data class StatusData(
         return isStatus() && !isVideo()
     }
 
+
+
     @SuppressLint("SimpleDateFormat")
     fun getDate(): String {
         val date = Date(modified)
@@ -46,9 +48,10 @@ data class StatusData(
     }
 
     fun save(): File {
-        val filename = "${System.currentTimeMillis()}${getExtension()}"
-        val target = File(MyApp.getAppFolder(),  filename)
-        return File(path).copyTo(target, true, 1024)
+        val folderName = MyApp.getAppFolder().absolutePath
+        val targetPath = path.replace(STATUS_FOLDER_PATH, folderName) +"/"
+        val target = File(targetPath)
+        return File(path).copyTo(target, false, 1024)
     }
 
     fun getUriToFile(context: Context): Uri {
@@ -70,6 +73,9 @@ data class StatusData(
     }
 
     companion object {
+
+        const val STATUS_FOLDER_PATH: String = "/WhatsApp/Media/.Statuses/"
+
 
         fun getBlankStatus(): StatusData {
             return StatusData("", System.currentTimeMillis());

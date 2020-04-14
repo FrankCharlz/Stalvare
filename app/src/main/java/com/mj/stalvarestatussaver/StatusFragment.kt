@@ -1,4 +1,4 @@
-package com.mj.stalvarestatussaver.ui.main
+package com.mj.stalvarestatussaver
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.mj.stalvarestatussaver.R
-import com.mj.stalvarestatussaver.StatusData
+import java.lang.Exception
 
 class StatusFragment : Fragment() {
 
@@ -18,6 +18,12 @@ class StatusFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mStatus = arguments?.getParcelable<StatusData>(SECTION_STATUS) ?: StatusData.getBlankStatus()
     }
+
+
+    val vm by lazy {
+        activity?.let { ViewModelProvider(it).get(SharedViewModel::class.java) } ?: throw Exception("Activity not defined")
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,7 +36,11 @@ class StatusFragment : Fragment() {
         Glide
             .with(imageView.context)
             .load(mStatus.path)
+            .fitCenter()
+            //.centerCrop()
             .into(imageView)
+
+        vm.setCurrentStatus(mStatus)
 
         return root
     }
