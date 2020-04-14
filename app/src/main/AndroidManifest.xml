@@ -17,7 +17,7 @@
         <activity
             android:name=".TabbedStatusActivity"
             android:label="@string/title_activity_tabbed_status"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.DopeFullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

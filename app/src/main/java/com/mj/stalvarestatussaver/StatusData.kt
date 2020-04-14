@@ -3,6 +3,7 @@ package com.mj.stalvarestatussaver
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.os.Parcelable
 import androidx.core.content.FileProvider
 import kotlinx.android.parcel.Parcelize
@@ -74,7 +75,7 @@ data class StatusData(
 
     companion object {
 
-        const val STATUS_FOLDER_PATH: String = "/WhatsApp/Media/.Statuses/"
+        const val STATUS_FOLDER_PATH: String =  "/WhatsApp/Media/.Statuses/"
 
 
         fun getBlankStatus(): StatusData {

@@ -54,7 +54,8 @@ class MainActivity : AppCompatActivity() {
         val files = directory.listFiles()
 
         if (files == null) {
-            Toast.makeText(this, "Could not load statuses.", Toast.LENGTH_SHORT).show();
+            Timber.e("error: ${directory.absolutePath}")
+            Toast.makeText(this, "Could not load statuses.", Toast.LENGTH_LONG).show();
             return
         }
 

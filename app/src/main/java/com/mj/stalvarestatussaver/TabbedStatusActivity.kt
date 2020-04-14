@@ -3,18 +3,19 @@ package com.mj.stalvarestatussaver
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
+import android.view.View
 import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.activity_tabbed_status.*
+import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 
 class TabbedStatusActivity : AppCompatActivity() {
 
@@ -35,8 +36,7 @@ class TabbedStatusActivity : AppCompatActivity() {
         loadStatuses();
 
 
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener {
+        save.setOnClickListener {
             val status = vm.getCurrentStatus()
             try {
                 val f = status.save()
@@ -53,15 +53,16 @@ class TabbedStatusActivity : AppCompatActivity() {
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
 
-
-
     }
+
+
 
 
     inner class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
         FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
+            Timber.i("pos: $position")
             return StatusFragment.newInstance(vm.mStatuses[position])
         }
 
@@ -90,6 +91,7 @@ class TabbedStatusActivity : AppCompatActivity() {
         val files = directory.listFiles()
 
         if (files == null) {
+            Timber.e("error: ${directory.absolutePath}")
             Toast.makeText(context, "Could not load statuses.", Toast.LENGTH_SHORT).show();
             return
         }
