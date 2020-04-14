@@ -1,9 +1,9 @@
 package com.mj.stalvarestatussaver
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -11,8 +11,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_tabbed_status.*
 import timber.log.Timber
 import java.io.File
@@ -46,12 +44,32 @@ class TabbedStatusActivity : AppCompatActivity() {
             }
         }
 
+
+        play.setOnClickListener {
+            val status = vm.getCurrentStatus()
+            val intent = status.getVideoIntent(it.context)
+            startActivity(intent)
+        }
+
+        share.setOnClickListener {
+            val status = vm.getCurrentStatus()
+            val shareIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                setDataAndType(status.getUriToFile(context), status.getMimeType())
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(R.string.send_to)))
+        }
+
+
+
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
 
-        val tabs: TabLayout = findViewById(R.id.tabs)
-        tabs.setupWithViewPager(viewPager)
+//        val tabs: TabLayout = findViewById(R.id.tabs)
+//        tabs.setupWithViewPager(viewPager)
 
     }
 
@@ -73,6 +91,8 @@ class TabbedStatusActivity : AppCompatActivity() {
         override fun getCount(): Int {
             return vm.mStatuses.size
         }
+
+
     }
 
 

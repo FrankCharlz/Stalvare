@@ -2,8 +2,8 @@ package com.mj.stalvarestatussaver
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
-import android.os.Environment
 import android.os.Parcelable
 import androidx.core.content.FileProvider
 import kotlinx.android.parcel.Parcelize
@@ -61,8 +61,7 @@ data class StatusData(
         val uri = FileProvider
             .getUriForFile(
             context, context.
-            applicationContext
-                .packageName.toString() + ".provider", File(path)
+            applicationContext.packageName.toString() + ".provider", File(path)
         )
 
         return uri
@@ -72,6 +71,28 @@ data class StatusData(
         if (isVideo()) return "video/*"
         else return "image/*"
     }
+
+    fun getImage(): Any {
+
+        if (isVideo()) {
+            return VideoThumbnailCache.getBitmap(path)
+        } else {
+            return path
+        }
+    }
+
+    fun getVideoIntent(context: Context): Intent {
+        val uri = getUriToFile(context);
+        val intent = Intent(Intent.ACTION_VIEW, uri )
+        intent.setDataAndType(uri, "video/mp4")
+        return intent
+    }
+//
+//    fun getShareIntent(context: Context): Intent {
+//        val status = vm.getCurrentStatus()
+//
+//
+//    }
 
     companion object {
 

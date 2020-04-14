@@ -37,9 +37,16 @@ class StatusFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_tabbed_status, container, false)
 
-        mImageView = root.findViewById<ImageView>(R.id.imageView)
+//        mImageView = root.findViewById<ImageView>(R.id.imageView)
+//        Picasso.get().load(mStatus.path).fit().into(PicassoTarget())
 
-        Picasso.get().load(mStatus.path).fit().into(PicassoTarget())
+
+        val imageView = root.findViewById<ImageView>(R.id.imageView)
+        if (mStatus.isVideo()) {
+            imageView.setImageBitmap(VideoThumbnailCache.getBitmap(mStatus.path))
+        } else {
+            Picasso.get().load(mStatus.path).fit().into(imageView)
+        }
 
         vm.setCurrentStatus(mStatus)
 
@@ -101,4 +108,5 @@ class StatusFragment : Fragment() {
             }
         }
     }
+
 }
