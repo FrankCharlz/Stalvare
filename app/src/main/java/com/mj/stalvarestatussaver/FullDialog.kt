@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class FullDialog(
     title: String,
-    data: StatusData,
+    data: Status,
     type: Type,
     finishOnDismiss: Boolean
 ) : DialogFragment() {
@@ -83,7 +83,7 @@ class FullDialog(
         fun newInstance(
             activity: AppCompatActivity,
             title: String,
-            data: StatusData,
+            data: Status,
             type: Type = Type.NORMAL,
             finishOnDismiss: Boolean = false
         ) {

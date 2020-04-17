@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import android.view.View
 import android.widget.ImageView
 import androidx.core.content.FileProvider
 import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
@@ -17,7 +16,7 @@ import java.util.*
 
 
 @Parcelize
-data class StatusData(
+data class Status(
     val path: String,
     val modified: Long
 
@@ -43,8 +42,6 @@ data class StatusData(
         return isStatus() && !isVideo()
     }
 
-
-
     @SuppressLint("SimpleDateFormat")
     fun getDate(): String {
         val date = Date(modified)
@@ -53,7 +50,7 @@ data class StatusData(
     }
 
     fun save(): File {
-        val folderName = MyApp.getAppFolder().absolutePath
+        val folderName = MyApp.getAppFolder().absolutePath + "/"
         val targetPath = path.replace(STATUS_FOLDER_PATH, folderName) +"/"
         val target = File(targetPath)
         return File(path).copyTo(target, false, 1024)
@@ -78,6 +75,7 @@ data class StatusData(
 
     fun getVideoIntent(context: Context): Intent {
         //buggy in api level 21
+
         val uri = getUriToFile(context);
         val intent = Intent(Intent.ACTION_VIEW, uri )
         intent.setDataAndType(uri, "video/mp4")
@@ -107,8 +105,8 @@ data class StatusData(
         const val STATUS_FOLDER_PATH: String =  "/DCIM/Camera/"
 //        const val STATUS_FOLDER_PATH: String =  "/WhatsApp/Media/.Statuses/"
 
-        fun getBlankStatus(): StatusData {
-            return StatusData("", System.currentTimeMillis());
+        fun getBlankStatus(): Status {
+            return Status("", System.currentTimeMillis());
         }
     }
 }

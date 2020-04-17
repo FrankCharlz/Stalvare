@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
 import com.mj.stalvarestatussaver.*
 import com.mj.stalvarestatussaver.utils.PaletteCache
-import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import timber.log.Timber
@@ -22,16 +21,16 @@ import timber.log.Timber
 class StatusFragment : Fragment() {
 
     private lateinit var mImageView: ImageView
-    private lateinit var mStatus: StatusData
+    private lateinit var mStatus: Status
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mStatus = arguments?.getParcelable<StatusData>(
+        mStatus = arguments?.getParcelable<Status>(
             SECTION_STATUS
-        ) ?: StatusData.getBlankStatus()
+        ) ?: Status.getBlankStatus()
     }
 
-    val vm by lazy {
+    private val vm by lazy {
         activity?.let { ViewModelProvider(it).get(SharedViewModel::class.java) } ?: throw Exception("Activity not defined")
     }
 
@@ -106,7 +105,7 @@ class StatusFragment : Fragment() {
         private const val SECTION_STATUS = "sectionStatus"
 
         @JvmStatic
-        fun newInstance(status: StatusData): StatusFragment {
+        fun newInstance(status: Status): StatusFragment {
             return StatusFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(SECTION_STATUS, status)

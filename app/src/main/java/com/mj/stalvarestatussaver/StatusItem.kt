@@ -10,12 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
-import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
-import com.squareup.picasso.Picasso
 import timber.log.Timber
 
 
-open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder>() {
+open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() {
 
     val status = _status
 
@@ -28,8 +26,6 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<StatusItem>(view) {
 
-
-        var container: View = view.findViewById(R.id.item_container)
         var name: TextView = view.findViewById(R.id.name)
         var image: ImageView = view.findViewById(R.id.imageView)
         var save: ImageView = view.findViewById(R.id.img_save)
@@ -47,7 +43,6 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
             }
 
             item.status.setImage(image)
-
             play.visibility = if (item.status.isVideo()) View.VISIBLE else View.GONE;
 
 
@@ -58,7 +53,7 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
             Timber.d("unbinding")
         }
 
-        private fun shareStatus(context: Context, status: StatusData) {
+        private fun shareStatus(context: Context, status: Status) {
 
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
@@ -69,7 +64,7 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
             context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(R.string.send_to)))
         }
 
-        private fun saveStatus(context: Context, status: StatusData) {
+        private fun saveStatus(context: Context, status: Status) {
 
             try {
                 val f = status.save()
@@ -86,7 +81,7 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
 
         }
 
-        private fun playStatus(context: Context, status: StatusData) {
+        private fun playStatus(context: Context, status: Status) {
 //            val intent = status.getVideoIntent(context)
 
             val uri = Uri.fromFile(status.getFile())

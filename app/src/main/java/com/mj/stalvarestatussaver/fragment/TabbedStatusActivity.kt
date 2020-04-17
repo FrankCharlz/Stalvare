@@ -12,16 +12,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.mj.stalvarestatussaver.R
 import com.mj.stalvarestatussaver.SharedViewModel
-import com.mj.stalvarestatussaver.StatusData
-import com.mj.stalvarestatussaver.StatusItem
+import com.mj.stalvarestatussaver.Status
 import kotlinx.android.synthetic.main.activity_tabbed_status.*
 import timber.log.Timber
 
 class TabbedStatusActivity : AppCompatActivity() {
 
-    private lateinit var mStatuses: ArrayList<StatusData>
-
-    //private lateinit var vm.mStatuses: List<StatusItem>
     private lateinit var context: Context
 
     val vm by lazy {
@@ -69,7 +65,7 @@ class TabbedStatusActivity : AppCompatActivity() {
         val position = intent.getIntExtra(KEY_POSITION, 0)
 
 
-        val statuses: ArrayList<StatusData> =  intent.getParcelableArrayListExtra(KEY_STATUSES) ?: arrayListOf()
+        val statuses: ArrayList<Status> =  intent.getParcelableArrayListExtra(KEY_STATUSES) ?: arrayListOf()
 
         if (statuses.isEmpty()) {
             Toast.makeText(this, "Could not load status", Toast.LENGTH_SHORT).show();
@@ -84,7 +80,7 @@ class TabbedStatusActivity : AppCompatActivity() {
         vm.mStatuses = statuses
 
         Timber.d("pos: $position")
-        Timber.d("statuses $mStatuses")
+        Timber.d("statuses $statuses")
 
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
@@ -124,7 +120,7 @@ class TabbedStatusActivity : AppCompatActivity() {
         fun start(
             context: Context,
             position: Int,
-            statuses: ArrayList<StatusData>
+            statuses: ArrayList<Status>
         ) {
             val intent = Intent(context, TabbedStatusActivity::class.java)
             intent.putExtra(KEY_POSITION, position)
