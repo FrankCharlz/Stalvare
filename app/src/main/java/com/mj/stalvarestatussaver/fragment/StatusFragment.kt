@@ -1,4 +1,4 @@
-package com.mj.stalvarestatussaver
+package com.mj.stalvarestatussaver.fragment
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,6 +12,9 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
+import com.mj.stalvarestatussaver.*
+import com.mj.stalvarestatussaver.utils.PaletteCache
+import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import timber.log.Timber
@@ -23,7 +26,9 @@ class StatusFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mStatus = arguments?.getParcelable<StatusData>(SECTION_STATUS) ?: StatusData.getBlankStatus()
+        mStatus = arguments?.getParcelable<StatusData>(
+            SECTION_STATUS
+        ) ?: StatusData.getBlankStatus()
     }
 
     val vm by lazy {
@@ -43,7 +48,11 @@ class StatusFragment : Fragment() {
 
         val imageView = root.findViewById<ImageView>(R.id.imageView)
         if (mStatus.isVideo()) {
-            imageView.setImageBitmap(VideoThumbnailCache.getBitmap(mStatus.path))
+            imageView.setImageBitmap(
+                VideoThumbnailCache.getBitmap(
+                    mStatus.path
+                )
+            )
         } else {
             Picasso.get().load(mStatus.path).fit().into(imageView)
         }
@@ -75,7 +84,10 @@ class StatusFragment : Fragment() {
                         return@generate
                     }
 
-                    PaletteCache.save(mStatus.path, it) //caching
+                    PaletteCache.save(
+                        mStatus.path,
+                        it
+                    ) //caching
                     updateColors(it);
                 }
             }
@@ -84,7 +96,9 @@ class StatusFragment : Fragment() {
 
     private fun updateColors(palette: Palette) {
 
-        val titleColor: Int = palette.vibrantSwatch?.titleTextColor ?: resources.getColor(R.color.primaryLightColor)
+        val titleColor: Int = palette.vibrantSwatch?.titleTextColor ?: resources.getColor(
+            R.color.primaryLightColor
+        )
 
         val c1 = Color.parseColor("#000000")
         val c2 = Color.parseColor("#ffffff")

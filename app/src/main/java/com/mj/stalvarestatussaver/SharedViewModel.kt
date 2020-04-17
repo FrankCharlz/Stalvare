@@ -8,7 +8,7 @@ class SharedViewModel: ViewModel() {
 
     private lateinit var mCurrentStatus: StatusData
 
-    val mStatuses: ArrayList<StatusData> = arrayListOf()
+    var mStatuses: ArrayList<StatusData> = arrayListOf()
 
     fun getCurrentStatus(): StatusData {
         Timber.d("getting current status: ${mCurrentStatus.path}")

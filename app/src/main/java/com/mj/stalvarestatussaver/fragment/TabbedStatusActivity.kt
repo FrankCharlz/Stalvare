@@ -1,9 +1,8 @@
-package com.mj.stalvarestatussaver
+package com.mj.stalvarestatussaver.fragment
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -11,11 +10,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
+import com.mj.stalvarestatussaver.R
+import com.mj.stalvarestatussaver.SharedViewModel
+import com.mj.stalvarestatussaver.StatusData
 import kotlinx.android.synthetic.main.activity_tabbed_status.*
 import timber.log.Timber
-import java.io.File
 
 class TabbedStatusActivity : AppCompatActivity() {
+
+    private lateinit var mStatuses: Array<StatusData>
 
     //private lateinit var vm.mStatuses: List<StatusItem>
     private lateinit var context: Context
@@ -30,9 +33,6 @@ class TabbedStatusActivity : AppCompatActivity() {
         setContentView(R.layout.activity_tabbed_status)
 
         context = this
-
-        loadStatuses();
-
 
         save.setOnClickListener {
             val status = vm.getCurrentStatus()
@@ -59,17 +59,23 @@ class TabbedStatusActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
-            context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(R.string.send_to)))
+            context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(
+                R.string.send_to
+            )))
         }
 
 
+        mStatuses  = (intent.getParcelableArrayExtra(KEY_STATUSES) ?: arrayOf()) as Array<StatusData>;
 
-        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
-        val viewPager: ViewPager = findViewById(R.id.view_pager)
-        viewPager.adapter = sectionsPagerAdapter
+        Timber.e("statuses $mStatuses")
 
 //        val tabs: TabLayout = findViewById(R.id.tabs)
 //        tabs.setupWithViewPager(viewPager)
+
+
+//        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
+//        val viewPager: ViewPager = findViewById(R.id.view_pager)
+//        viewPager.adapter = sectionsPagerAdapter
 
     }
 
@@ -95,33 +101,16 @@ class TabbedStatusActivity : AppCompatActivity() {
 
     }
 
+    companion object {
 
-    private fun loadStatuses() {
+        const val KEY_STATUSES: String = "statuses";
 
-        val path = Environment.getExternalStorageDirectory()?.absolutePath + StatusData.STATUS_FOLDER_PATH
+        fun start(context: Context, statuses: Array<StatusData>) {
 
-        val directory = File(path)
-
-
-        if (!directory.isDirectory)   {
-            Toast.makeText(context, "$path is not a valid directory.", Toast.LENGTH_SHORT).show();
-            return
+            val intent = Intent(context, TabbedStatusActivity::class.java)
+            intent.putExtra(KEY_STATUSES, statuses)
+            context.startActivity(intent);
         }
-
-        val files = directory.listFiles()
-
-        if (files == null) {
-            Timber.e("error: ${directory.absolutePath}")
-            Toast.makeText(context, "Could not load statuses.", Toast.LENGTH_SHORT).show();
-            return
-        }
-
-        vm.mStatuses.addAll( files
-            .map { StatusData(it.absolutePath, it.lastModified()) }
-            .filter { it.isStatus() }
-            .sortedByDescending { it.modified }
-        )
-
     }
 
 }

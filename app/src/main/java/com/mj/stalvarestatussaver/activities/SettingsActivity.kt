@@ -1,8 +1,9 @@
-package com.mj.stalvarestatussaver
+package com.mj.stalvarestatussaver.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import com.mj.stalvarestatussaver.R
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -12,7 +13,10 @@ class SettingsActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.settings, SettingsFragment())
+            .replace(
+                R.id.settings,
+                SettingsFragment()
+            )
             .commit()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

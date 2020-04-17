@@ -1,27 +1,34 @@
-package com.mj.stalvarestatussaver
+package com.mj.stalvarestatussaver.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.ImageView
 import android.widget.Toast
-import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
+import com.mj.stalvarestatussaver.R
+import com.mj.stalvarestatussaver.StatusData
+import com.mj.stalvarestatussaver.StatusItem
+import com.mj.stalvarestatussaver.fragment.TabbedStatusActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import java.io.File
 
+
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var mStatuses: List<StatusItem>
     private lateinit var mFastAdapter: FastAdapter<StatusItem>
     private lateinit var mItemsAdapter: ItemAdapter<StatusItem>
+    private lateinit var mAdView: AdView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +37,29 @@ class MainActivity : AppCompatActivity() {
         mItemsAdapter = ItemAdapter<StatusItem>();
         mFastAdapter = FastAdapter.with(mItemsAdapter)
 
-        recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.layoutManager = StaggeredGridLayoutManager(2, 1)
         recycler_view.adapter = mFastAdapter
 
+        mFastAdapter.onClickListener = { view, adapter, item, position ->
+
+            val statuses = mStatuses.map { it.status }.toTypedArray()
+
+            //swap current item to head of the list..
+            statuses[position] = statuses[0]
+            statuses[0] = item.status
+
+            TabbedStatusActivity.start(this, statuses)
+            false
+        }
 
         loadListOfFiles()
+
+        mAdView = findViewById(R.id.adView)
+        mAdView.loadAd(AdRequest.Builder().build())
+
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = " All statuses"
 
     }
 
@@ -59,25 +84,22 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val statuses = files
-            .map { StatusData(it.absolutePath, it.lastModified())}
+        mStatuses = files
+            .map {
+                StatusData(
+                    it.absolutePath,
+                    it.lastModified()
+                )
+            }
             .filter { it.isStatus() }
             .map { StatusItem(it) }
             .sortedByDescending { it.status.modified }
 
-        mItemsAdapter.add(statuses)
+        mItemsAdapter.add(mStatuses)
 
     }
 
     companion object {
-
-        @BindingAdapter("profileImage")
-        fun loadImage(view: ImageView, profileImage: String) {
-            Glide.with(view.context)
-                .load(profileImage)
-                .into(view)
-        }
-
 
     }
 

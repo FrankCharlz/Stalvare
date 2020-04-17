@@ -6,16 +6,19 @@
         android:id="@+id/tabs"
         android:icon="@drawable/tabs"
         android:title="@string/show_as_tabs"
-        android:visible="true" />
+        android:visible="true"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/list"
         android:icon="@drawable/tabs"
         android:title="@string/show_as_list"
-        android:visible="true" />
+        android:visible="true"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/settings"
         android:icon="@drawable/tabs"
         android:title="@string/settings"
-        android:visible="true" />
+        android:visible="true"
+        app:showAsAction="ifRoom" />
 </menu>

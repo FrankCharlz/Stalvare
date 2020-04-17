@@ -13,17 +13,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:maxHeight="200dp"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@mipmap/ic_launcher"
+        android:contentDescription="@string/app_name"/>
 
-    <LinearLayout
-        android:id="@+id/strip"
+    <ImageView
+        android:id="@+id/play"
+        android:layout_width="@dimen/action_icon_width"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/save"
+        android:layout_gravity="center"
+        android:contentDescription="@string/app_name"/>
+
+    <RelativeLayout
+        android:id="@+id/ribbon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="#60000000"
-        android:padding="12dp"
+        android:padding="@dimen/ribbon_padding"
         android:layout_gravity="bottom"
+        android:gravity="center"
         >
 
         <TextView
@@ -31,26 +40,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:gravity="center"
-            android:textColor="#ffffff"/>
+            android:textColor="#ffffff"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/img_save"
+            />
 
         <ImageView
             android:id="@+id/img_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:src="@drawable/save"
-            android:layout_gravity="end"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/app_name"
             />
 
-        <ImageView
-            android:id="@+id/img_share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:src="@drawable/share" />
 
-
-    </LinearLayout>
+    </RelativeLayout>
 
 
 

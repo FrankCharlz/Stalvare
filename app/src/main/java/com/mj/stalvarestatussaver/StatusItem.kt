@@ -8,9 +8,11 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.bumptech.glide.Glide
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
+import com.squareup.picasso.Picasso
+import timber.log.Timber
 
 
 open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder>() {
@@ -27,46 +29,34 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
     class ViewHolder(view: View) : FastAdapter.ViewHolder<StatusItem>(view) {
 
 
+        var container: View = view.findViewById(R.id.item_container)
         var name: TextView = view.findViewById(R.id.name)
         var image: ImageView = view.findViewById(R.id.imageView)
         var save: ImageView = view.findViewById(R.id.img_save)
-        var share: ImageView = view.findViewById(R.id.img_share)
+        var play: ImageView = view.findViewById(R.id.play)
 
         override fun bindView(item: StatusItem, payloads: List<Any>) {
-            name.text = item.status.getDate()
+
+            name.text = "${item.status.getDate()}"
+
+            play.setOnClickListener {
+                playStatus(it.context, item.status)
+            }
             save.setOnClickListener {
                 saveStatus(it.context, item.status)
             }
 
-            share.setOnClickListener {
-                shareStatus(it.context, item.status)
-            }
+            item.status.setImage(image)
 
-            if (item.status.isImage()) {
-                Glide.with(image.context)
-                    .load(item.status.path)
-                    .centerCrop()
-                    .into(image)
+            play.visibility = if (item.status.isVideo()) View.VISIBLE else View.GONE;
 
-                return
-            }
-
-            if (item.status.isVideo()) {
-                Glide.with(image.context)
-                    .load(VideoThumbnailCache.getBitmap(item.status.path))
-                    .centerCrop()
-                    .into(image)
-
-                return
-            }
 
         }
 
 
         override fun unbindView(item: StatusItem) {
-            name.text = null
+            Timber.d("unbinding")
         }
-
 
         private fun shareStatus(context: Context, status: StatusData) {
 
@@ -94,6 +84,15 @@ open class StatusItem(_status : StatusData) : AbstractItem<StatusItem.ViewHolder
                 Toast.makeText(context, "Could not save status: ${e.message}", Toast.LENGTH_SHORT).show();
             }
 
+        }
+
+        private fun playStatus(context: Context, status: StatusData) {
+//            val intent = status.getVideoIntent(context)
+
+            val uri = Uri.fromFile(status.getFile())
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            intent.setDataAndType(uri, "video/*")
+            context.startActivity(intent)
         }
 
 
