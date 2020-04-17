@@ -42,13 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         mFastAdapter.onClickListener = { view, adapter, item, position ->
 
-            val statuses = mStatuses.map { it.status }.toTypedArray()
-
-            //swap current item to head of the list..
-            statuses[position] = statuses[0]
-            statuses[0] = item.status
-
-            TabbedStatusActivity.start(this, statuses)
+            TabbedStatusActivity.start(this, position, ArrayList(mStatuses.map { it.status }))
             false
         }
 
@@ -96,6 +90,8 @@ class MainActivity : AppCompatActivity() {
             .sortedByDescending { it.status.modified }
 
         mItemsAdapter.add(mStatuses)
+//        mItemsAdapter.add(mStatuses)
+//        mItemsAdapter.add(mStatuses)
 
     }
 

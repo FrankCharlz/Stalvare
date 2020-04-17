@@ -47,15 +47,7 @@ class StatusFragment : Fragment() {
 
 
         val imageView = root.findViewById<ImageView>(R.id.imageView)
-        if (mStatus.isVideo()) {
-            imageView.setImageBitmap(
-                VideoThumbnailCache.getBitmap(
-                    mStatus.path
-                )
-            )
-        } else {
-            Picasso.get().load(mStatus.path).fit().into(imageView)
-        }
+        mStatus.setImage(imageView)
 
         vm.setCurrentStatus(mStatus)
 

@@ -13,12 +13,13 @@ import androidx.viewpager.widget.ViewPager
 import com.mj.stalvarestatussaver.R
 import com.mj.stalvarestatussaver.SharedViewModel
 import com.mj.stalvarestatussaver.StatusData
+import com.mj.stalvarestatussaver.StatusItem
 import kotlinx.android.synthetic.main.activity_tabbed_status.*
 import timber.log.Timber
 
 class TabbedStatusActivity : AppCompatActivity() {
 
-    private lateinit var mStatuses: Array<StatusData>
+    private lateinit var mStatuses: ArrayList<StatusData>
 
     //private lateinit var vm.mStatuses: List<StatusItem>
     private lateinit var context: Context
@@ -65,17 +66,30 @@ class TabbedStatusActivity : AppCompatActivity() {
         }
 
 
-        mStatuses  = (intent.getParcelableArrayExtra(KEY_STATUSES) ?: arrayOf()) as Array<StatusData>;
-
-        Timber.e("statuses $mStatuses")
-
-//        val tabs: TabLayout = findViewById(R.id.tabs)
-//        tabs.setupWithViewPager(viewPager)
+        val position = intent.getIntExtra(KEY_POSITION, 0)
 
 
-//        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
-//        val viewPager: ViewPager = findViewById(R.id.view_pager)
-//        viewPager.adapter = sectionsPagerAdapter
+        val statuses: ArrayList<StatusData> =  intent.getParcelableArrayListExtra(KEY_STATUSES) ?: arrayListOf()
+
+        if (statuses.isEmpty()) {
+            Toast.makeText(this, "Could not load status", Toast.LENGTH_SHORT).show();
+            finish()
+            return
+        }
+
+        if (position < statuses.size) {
+            statuses.add(0, statuses.removeAt(position))
+        }
+
+        vm.mStatuses = statuses
+
+        Timber.d("pos: $position")
+        Timber.d("statuses $mStatuses")
+
+
+        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
+        val viewPager: ViewPager = findViewById(R.id.view_pager)
+        viewPager.adapter = sectionsPagerAdapter
 
     }
 
@@ -84,6 +98,7 @@ class TabbedStatusActivity : AppCompatActivity() {
 
     inner class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
         FragmentPagerAdapter(fm) {
+
 
         override fun getItem(position: Int): Fragment {
             Timber.i("pos: $position")
@@ -103,11 +118,16 @@ class TabbedStatusActivity : AppCompatActivity() {
 
     companion object {
 
+        const val KEY_POSITION: String = "position";
         const val KEY_STATUSES: String = "statuses";
 
-        fun start(context: Context, statuses: Array<StatusData>) {
-
+        fun start(
+            context: Context,
+            position: Int,
+            statuses: ArrayList<StatusData>
+        ) {
             val intent = Intent(context, TabbedStatusActivity::class.java)
+            intent.putExtra(KEY_POSITION, position)
             intent.putExtra(KEY_STATUSES, statuses)
             context.startActivity(intent);
         }
