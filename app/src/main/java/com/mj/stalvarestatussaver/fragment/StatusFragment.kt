@@ -2,13 +2,13 @@ package com.mj.stalvarestatussaver.fragment
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
@@ -20,6 +20,7 @@ import timber.log.Timber
 
 class StatusFragment : Fragment() {
 
+    private lateinit var mRoot: View
     private lateinit var mImageView: ImageView
     private lateinit var mStatus: Status
 
@@ -39,24 +40,24 @@ class StatusFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_tabbed_status, container, false)
+        mRoot = inflater.inflate(R.layout.fragment_tabbed_status, container, false)
 
-//        mImageView = root.findViewById<ImageView>(R.id.imageView)
+        mImageView = mRoot.findViewById<ImageView>(R.id.imageView)
 //        Picasso.get().load(mStatus.path).fit().into(PicassoTarget())
 
 
-        val imageView = root.findViewById<ImageView>(R.id.imageView)
-        mStatus.setImage(imageView)
+//        val imageView = root.findViewById<ImageView>(R.id.imageView)
+        mStatus.setImage(PicassoTarget())
 
         vm.setCurrentStatus(mStatus)
 
-        return root
+        return mRoot
     }
 
 
     inner class PicassoTarget: Target {
         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-            TODO("Not yet implemented")
+            //TODO("Not yet implemented")
         }
 
         override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
@@ -64,41 +65,30 @@ class StatusFragment : Fragment() {
         }
 
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+
             mImageView.setImageBitmap(bitmap)
 
             if (PaletteCache.has(mStatus.path)) {
-                updateColors(PaletteCache.get(mStatus.path))
+                vm.setPalette(PaletteCache.get(mStatus.path))
+                Timber.i("palette loaded from chache")
             } else {
+                Timber.i("palette calculating..")
+
                 Palette.from(BitmapFactory.decodeFile(mStatus.path)).generate {
                     if (it == null) {
                         Timber.e("Could not generate palette")
                         return@generate
                     }
 
-                    PaletteCache.save(
-                        mStatus.path,
-                        it
-                    ) //caching
-                    updateColors(it);
+                    PaletteCache.save(mStatus.path, it) //caching
+                    Timber.i("setting palette in vm")
+                    vm.setPalette(it)
+                    mRoot.setBackgroundColor(it.getDarkMutedColor(ContextCompat.getColor(mRoot.context, R.color.white)))
                 }
             }
         }
     }
 
-    private fun updateColors(palette: Palette) {
-
-        val titleColor: Int = palette.vibrantSwatch?.titleTextColor ?: resources.getColor(
-            R.color.primaryLightColor
-        )
-
-        val c1 = Color.parseColor("#000000")
-        val c2 = Color.parseColor("#ffffff")
-        var c1_ = palette.getDarkVibrantColor(c1)
-        val c2_ = palette.getLightVibrantColor(c2)
-
-        Timber.i("shall update colors")
-
-    }
 
     companion object {
 

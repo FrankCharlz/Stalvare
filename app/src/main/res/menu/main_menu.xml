@@ -4,14 +4,14 @@
 
     <item
         android:id="@+id/tabs"
-        android:icon="@drawable/tabs"
+        android:icon="@drawable/ic_view_list_black_24dp"
         android:title="@string/show_as_tabs"
         android:visible="true"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/settings"
-        android:icon="@drawable/save"
+        android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings"
         android:visible="true"
         app:showAsAction="ifRoom" />

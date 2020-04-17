@@ -7,8 +7,13 @@ import android.net.Uri
 import android.os.Parcelable
 import android.widget.ImageView
 import androidx.core.content.FileProvider
+import androidx.lifecycle.LiveData
+import androidx.palette.graphics.Palette
+import com.mj.stalvarestatussaver.fragment.StatusFragment
+import com.mj.stalvarestatussaver.utils.PaletteCache
 import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 import java.text.SimpleDateFormat
@@ -99,6 +104,22 @@ data class Status(
         }
 
     }
+
+    fun setImage(target: Target) {
+
+        if (isImage()) {
+            Picasso.get().load(getFile()).into(target)
+            return
+        }
+
+//        if (isVideo()) {
+//            target.
+//            view.setImageBitmap(VideoThumbnailCache.getBitmap(path))
+//            return
+//        }
+
+    }
+
 
     companion object {
 

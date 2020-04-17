@@ -2,12 +2,14 @@ package com.mj.stalvarestatussaver.fragment
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import com.mj.stalvarestatussaver.R
@@ -86,6 +88,22 @@ class TabbedStatusActivity : AppCompatActivity() {
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
+
+
+        vm.currentPalette.observe(this, Observer {
+            Timber.i("pallete changed")
+
+            val c1 = Color.parseColor("#000000")
+            val c2 = Color.parseColor("#ffffff")
+            var c1_ = it.getDarkVibrantColor(c1)
+            val c2_ = it.getLightVibrantColor(c2)
+
+
+            play.setTextColor(it?.dominantSwatch?.titleTextColor ?: c1)
+            save.setTextColor(it?.dominantSwatch?.titleTextColor ?: c1)
+            share.setTextColor(it?.dominantSwatch?.titleTextColor ?: c1)
+
+        })
 
     }
 
