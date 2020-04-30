@@ -24,7 +24,7 @@
         <com.google.android.material.button.MaterialButton
             style="@style/ActionButtonStyle"
             android:id="@+id/play"
-            app:icon="@drawable/download"
+            app:icon="@drawable/ic_play_arrow_black_24dp"
             android:text="play" />
 
 

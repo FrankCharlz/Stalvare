@@ -3,19 +3,24 @@ package com.mj.stalvarestatussaver
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Parcelable
 import android.widget.ImageView
 import androidx.core.content.FileProvider
-import androidx.lifecycle.LiveData
 import androidx.palette.graphics.Palette
-import com.mj.stalvarestatussaver.fragment.StatusFragment
 import com.mj.stalvarestatussaver.utils.PaletteCache
 import com.mj.stalvarestatussaver.utils.VideoThumbnailCache
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,7 +55,7 @@ data class Status(
     @SuppressLint("SimpleDateFormat")
     fun getDate(): String {
         val date = Date(modified)
-        val sdf = SimpleDateFormat("dd MMM, yyyy HH:mm")
+        val sdf = SimpleDateFormat("MMM dd, HH:mm")
         return sdf.format(date) ?: "-/-"
     }
 
@@ -74,17 +79,19 @@ data class Status(
         return if (isVideo()) "video/*" else "image/*"
     }
 
-    fun getImage(): Any {
-        return if (isVideo()) VideoThumbnailCache.getBitmap(path) else path
-    }
-
     fun getVideoIntent(context: Context): Intent {
         //buggy in api level 21
-
-        val uri = getUriToFile(context);
-        val intent = Intent(Intent.ACTION_VIEW, uri )
-        intent.setDataAndType(uri, "video/mp4")
-        return intent
+        if (android.os.Build.VERSION.SDK_INT >= 24){
+            val uri = getUriToFile(context);
+            val i1 = Intent(Intent.ACTION_VIEW, uri )
+            i1.setDataAndType(uri, "video/*")
+            return i1
+        } else{
+            val uri = Uri.fromFile(getFile())
+            val i2 = Intent(Intent.ACTION_VIEW, uri)
+            i2.setDataAndType(uri, "video/*")
+            return  i2
+        }
     }
 
     fun getFile(): File {
@@ -112,19 +119,28 @@ data class Status(
             return
         }
 
-//        if (isVideo()) {
-//            target.
-//            view.setImageBitmap(VideoThumbnailCache.getBitmap(path))
-//            return
-//        }
-
     }
 
+    private fun getBitmap(): Bitmap? {
+        if (isVideo()) return VideoThumbnailCache.getBitmap(path)
+        else return BitmapFactory.decodeFile(path)
+    }
+
+    fun loadAndCachePalette() {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val palette = getBitmap()?.let { Palette.from(it).generate() }
+                palette?.let { PaletteCache.save(path, it) }
+            } catch (e: Exception) {
+                Timber.e("error: ${e.message}")
+            }
+        }
+    }
 
     companion object {
 
-        const val STATUS_FOLDER_PATH: String =  "/DCIM/Camera/"
-//        const val STATUS_FOLDER_PATH: String =  "/WhatsApp/Media/.Statuses/"
+        //        const val STATUS_FOLDER_PATH: String =  "/DCIM/Camera/"
+        const val STATUS_FOLDER_PATH: String =  "/WhatsApp/Media/.Statuses/"
 
         fun getBlankStatus(): Status {
             return Status("", System.currentTimeMillis());

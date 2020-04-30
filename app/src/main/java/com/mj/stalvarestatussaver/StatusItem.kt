@@ -4,12 +4,17 @@ package com.mj.stalvarestatussaver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.google.android.material.button.MaterialButton
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
+import com.mj.stalvarestatussaver.utils.PaletteCache
+import com.mj.stalvarestatussaver.utils.setTransparency
 import timber.log.Timber
 
 
@@ -26,6 +31,7 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
 
     class ViewHolder(view: View) : FastAdapter.ViewHolder<StatusItem>(view) {
 
+        var ribbon: RelativeLayout = view.findViewById(R.id.ribbon)
         var name: TextView = view.findViewById(R.id.name)
         var image: ImageView = view.findViewById(R.id.imageView)
         var save: ImageView = view.findViewById(R.id.img_save)
@@ -44,6 +50,15 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
 
             item.status.setImage(image)
             play.visibility = if (item.status.isVideo()) View.VISIBLE else View.GONE;
+
+            val palette = PaletteCache.get(item.status.path)?.let {
+
+                it.darkVibrantSwatch?.rgb?.let { it1 -> ribbon.setBackgroundColor(it1.setTransparency(0.5f)) }
+                it.darkVibrantSwatch?.bodyTextColor.let {
+                        it1 ->
+                    it1?.let { it2 -> name.setTextColor(it2) }
+                }
+            }
 
 
         }
@@ -82,11 +97,7 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
         }
 
         private fun playStatus(context: Context, status: Status) {
-//            val intent = status.getVideoIntent(context)
-
-            val uri = Uri.fromFile(status.getFile())
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            intent.setDataAndType(uri, "video/*")
+            val intent = status.getVideoIntent(context)
             context.startActivity(intent)
         }
 

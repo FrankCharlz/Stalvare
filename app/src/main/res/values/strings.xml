@@ -28,7 +28,11 @@
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
 
     <string name="saveAll">Save all (Ad)</string>
-
+    <string name="signature">Laudix Tech</string>
+    <string name="camera_and_location_rationale">Why nataka perms</string>
+    <string name="permission_camera_denied">NEVER ASK</string>
+    <string name="permission_camera_never_askagain">NEVER ASK</string>
+    <string name="signature2">Status Saver \nby laudix tech</string>
 
 
     <!--

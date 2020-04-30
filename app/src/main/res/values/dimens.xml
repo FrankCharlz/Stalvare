@@ -9,5 +9,6 @@
     <dimen name="action_icon_width">32dp</dimen>
     <dimen name="action_icon_width2">24dp</dimen>
 
-    <dimen name="ribbon_padding">40dp</dimen>
+    <dimen name="ribbon_padding">12dp</dimen>
+    <dimen name="action_play_size">120dp</dimen>
 </resources>

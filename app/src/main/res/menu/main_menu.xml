@@ -4,21 +4,19 @@
 
     <item
         android:id="@+id/tabs"
-        android:icon="@drawable/ic_view_list_black_24dp"
+        android:icon="@drawable/ic_dehaze_black_24dp"
         android:title="@string/show_as_tabs"
         android:visible="true"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings"
-        android:visible="true"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/save_all"
         android:title="@string/saveAll"
-        android:visible="true"
         app:showAsAction="never" />
 </menu>

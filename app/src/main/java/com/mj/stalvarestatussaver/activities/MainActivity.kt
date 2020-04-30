@@ -1,11 +1,16 @@
 package com.mj.stalvarestatussaver.activities
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -23,27 +28,45 @@ import com.mj.stalvarestatussaver.R
 import com.mj.stalvarestatussaver.Status
 import com.mj.stalvarestatussaver.StatusItem
 import com.mj.stalvarestatussaver.fragment.TabbedStatusActivity
+import com.tumblr.remember.Remember
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mListView: RecyclerView
-    private var mListStyleGrid: Boolean = true
     private lateinit var mStatuses: List<StatusItem>
     private lateinit var mFastAdapter: FastAdapter<StatusItem>
     private lateinit var mItemsAdapter: ItemAdapter<StatusItem>
     private lateinit var mAdView: AdView
     private lateinit var mInterstitialAd: InterstitialAd
 
+
+    override fun onResume() {
+        super.onResume()
+        Timber.e("resumed")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Timber.e("created")
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = " All statuses"
+
+        //logo animation
+        animate()
+
         mListView = recycler_view;
+        setLayoutManager(Remember.getBoolean(LIST_STYLE, true))
 
         mItemsAdapter = ItemAdapter();
         mFastAdapter = FastAdapter.with(mItemsAdapter)
@@ -56,55 +79,115 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        loadListOfFiles()
 
         mAdView = findViewById(R.id.adView)
         mAdView.loadAd(AdRequest.Builder().build())
+        loadAdInterstitial()
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = " All statuses"
+        CoroutineScope(Dispatchers.IO).launch {
+            val res = loadListOfFiles()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                when  {
+                    res.error != null -> {
+                        Toast.makeText(this@MainActivity, "Could not load statuses", Toast.LENGTH_SHORT).show();
+                        Timber.i("${res.error}")
+                    }
+
+                    res.statuses.isNullOrEmpty() -> {
+                        Toast.makeText(this@MainActivity, "Could not load statuses.", Toast.LENGTH_SHORT).show();
+                        Timber.i("Statuses null/empty")
+                    }
+
+                    else -> showStatuses(res.statuses)
+                }
+            }
+
+
+        }
+
 
     }
 
-    private fun loadListOfFiles() {
+    private fun animate() {
+        val SPLASH_DURATION: Long = 1700L
+
+        val anim = AlphaAnimation(0.55f, 1.0f)
+        anim.startOffset = 30
+        anim.repeatMode = Animation.REVERSE
+        anim.repeatCount = Animation.INFINITE
+        anim.duration = 500
+
+        Timber.e("start animation: ${System.currentTimeMillis()}")
+        logo.startAnimation(anim)
+
+        val zoom = AnimationUtils.loadAnimation(
+            applicationContext,
+            R.anim.zoom_in_fade_out
+        )
+
+        zoom.duration = 800L
+        zoom.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationEnd(animation: Animation?) { placeholder_view.visibility = View.GONE }
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
+
+        placeholder_view.postDelayed({placeholder_view.startAnimation(zoom)}, SPLASH_DURATION);
+
+    }
+
+    private fun showStatuses(statuses: List<Status>) {
+        mStatuses = statuses.map { StatusItem(it) }
+        mItemsAdapter.add(mStatuses)
+    }
+
+    private fun setLayoutManager(listStyleGrid: Boolean) {
+        Timber.e("list is grid: $listStyleGrid")
+        mListView.layoutManager = if (listStyleGrid)
+            StaggeredGridLayoutManager(resources.getInteger(R.integer.grid_span_count), 1)
+        else
+            LinearLayoutManager(this)
+    }
+
+
+    data class Resource(val statuses: List<Status>?, val error: String?)
+    private  fun loadListOfFiles(): Resource  {
 
         val path = Environment.getExternalStorageDirectory()?.absolutePath + Status.STATUS_FOLDER_PATH
-
         val directory = File(path)
 
-
         if (!directory.isDirectory)   {
-            Toast.makeText(this, "$path is not a valid directory.", Toast.LENGTH_SHORT).show();
-            return
+            return Resource(null, "$path is not a valid directory.")
         }
 
         val files = directory.listFiles()
 
         if (files == null) {
-            Timber.e("error: ${directory.absolutePath}")
-            Toast.makeText(this, "Could not load statuses.", Toast.LENGTH_LONG).show();
-            return
+            Timber.e("error 2: ${directory.absolutePath}");
+            return Resource(null, "Could not load statuses.")
+
         }
 
-        mStatuses = files
-            .map {
-                Status(
-                    it.absolutePath,
-                    it.lastModified()
-                )
-            }
+        val statuses = files
+            .map { Status(it.absolutePath, it.lastModified()) }
             .filter { it.isStatus() }
-            .map { StatusItem(it) }
-            .sortedByDescending { it.status.modified }
+            .sortedByDescending { it.modified }
 
-        mItemsAdapter.add(mStatuses)
+        statuses.forEach { it.loadAndCachePalette() }
+        return Resource(statuses, null)
 
     }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.main_menu, menu)
+
+        val listStyleGrid = Remember.getBoolean(LIST_STYLE, true)
+        menu.findItem(R.id.tabs)?.icon = resources
+            .getDrawable(if (listStyleGrid) R.drawable.ic_dehaze_black_24dp else R.drawable.ic_dashboard_black_24dp)
         return true
     }
 
@@ -112,7 +195,11 @@ class MainActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.tabs -> {
-                switchListStyle()
+                val listStyleGrid = Remember.getBoolean(LIST_STYLE, true)
+                Remember.putBoolean(LIST_STYLE, !listStyleGrid)
+                setLayoutManager(listStyleGrid)
+                item.icon = resources
+                    .getDrawable(if (listStyleGrid) R.drawable.ic_dehaze_black_24dp else R.drawable.ic_dashboard_black_24dp)
                 false
             }
 
@@ -130,19 +217,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveAll() {
-        //// TODO: 17-Apr-20 show dialog
-        var count = 0;
-        for (status in mStatuses) {
-            try {
-                status.status.save()
-                count++
-            } catch (e: Exception) {
-                Toast.makeText(this, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show();
+
+        val progress = ProgressDialog(this)
+        progress.setMessage("Saving, please wait...")
+        progress.isIndeterminate = true
+        progress.show()
+
+
+        if (mInterstitialAd.isLoaded) {
+            mInterstitialAd.show()
+            loadAdInterstitial() //load another..
+        } else {
+            Timber.i("The interstitial wasn't loaded yet.");
+        }
+
+        Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
+
+        CoroutineScope(Dispatchers.IO).launch {
+            var count = 0;
+            val exceptions = arrayListOf<Exception>()
+            for (status in mStatuses) {
+                try {
+                    status.status.save()
+                    count++
+                } catch (e: Exception) {
+                    exceptions.add(e)
+                }
+            }
+
+            CoroutineScope(Dispatchers.Main).launch {
+                progress.dismiss()
+
+                var message = "$count statuses saved successfully. "
+                if (exceptions.isNotEmpty()) {
+                    message += "${exceptions.size} statuses could not be saved: ${exceptions[0].localizedMessage}"
+                }
+
+                Snackbar.make(content, message, Snackbar.LENGTH_LONG).show()
             }
         }
 
-        Snackbar.make(content, "$count statuses saved successfuly", Snackbar.LENGTH_SHORT).show()
-        loadAdInterstitial();
 
     }
 
@@ -159,7 +273,12 @@ class MainActivity : AppCompatActivity() {
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                mInterstitialAd.show()
+                Timber.d("Interstitial loaded")
+
+                //show with probability 17% of the time
+                val r = java.util.Random()
+                if (r.nextInt(100) < 17) mInterstitialAd.show()
+
             }
 
             override fun onAdFailedToLoad(p0: Int) {
@@ -169,11 +288,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun switchListStyle() {
-        mListView.layoutManager = if (mListStyleGrid) LinearLayoutManager(this)
-        else StaggeredGridLayoutManager(resources.getInteger(R.integer.grid_span_count), 1)
-
-        mListStyleGrid = !mListStyleGrid
+    companion object {
+        const val LIST_STYLE: String = "listStyle"
+        const val RQ_READ_FILES: Int = 7
     }
+
 
 }

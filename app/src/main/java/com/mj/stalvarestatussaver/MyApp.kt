@@ -2,6 +2,7 @@ package com.mj.stalvarestatussaver
 
 import android.app.Application
 import android.os.Environment
+import com.tumblr.remember.Remember
 import timber.log.Timber
 import java.io.File
 
@@ -12,6 +13,10 @@ class MyApp: Application() {
         super.onCreate()
 
         Timber.plant(Timber.DebugTree())
+
+        Remember.init(this, packageName + "_preferences")
+
+        Timber.e("at ${System.currentTimeMillis()}")
     }
 
 

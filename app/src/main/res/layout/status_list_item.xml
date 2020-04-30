@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<androidx.cardview.widget.CardView
     android:id="@+id/item_container"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <ImageView
@@ -18,12 +21,13 @@
 
     <ImageView
         android:id="@+id/play"
-        android:layout_width="@dimen/action_icon_width"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/action_play_size"
         android:adjustViewBounds="true"
-        android:src="@drawable/save"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:contentDescription="@string/app_name"/>
+        android:gravity="center"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:contentDescription="@string/app_name" />
 
     <RelativeLayout
         android:id="@+id/ribbon"
@@ -32,8 +36,7 @@
         android:background="#60000000"
         android:padding="@dimen/ribbon_padding"
         android:layout_gravity="bottom"
-        android:gravity="center"
-        >
+        android:gravity="center">
 
         <TextView
             android:id="@+id/name"
@@ -45,14 +48,16 @@
             android:layout_toStartOf="@id/img_save"
             />
 
+
         <ImageView
             android:id="@+id/img_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:src="@drawable/save"
+            android:src="@drawable/download"
             android:layout_alignParentEnd="true"
             android:contentDescription="@string/app_name"
+            android:layout_centerHorizontal="true"
             />
 
 
@@ -60,4 +65,4 @@
 
 
 
-</FrameLayout>
+</androidx.cardview.widget.CardView>
