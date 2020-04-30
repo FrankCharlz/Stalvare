@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
         val zoom = AnimationUtils.loadAnimation(
             applicationContext,
-            R.anim.zoom_in_fade_out
+            R.anim.fade_out
         )
 
         zoom.duration = 800L

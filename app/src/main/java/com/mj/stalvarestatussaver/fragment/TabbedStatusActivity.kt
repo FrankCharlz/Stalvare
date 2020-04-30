@@ -95,7 +95,8 @@ class TabbedStatusActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             Timber.e("sent pos: $position")
-            return StatusFragment2(position)
+            val pos2 = (position + 1) % count
+            return StatusFragment2(pos2)
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

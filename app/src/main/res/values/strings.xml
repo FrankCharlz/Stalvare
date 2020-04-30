@@ -24,9 +24,6 @@
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
 
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
-
     <string name="saveAll">Save all (Ad)</string>
     <string name="signature">Laudix Tech</string>
     <string name="camera_and_location_rationale">Why nataka perms</string>
