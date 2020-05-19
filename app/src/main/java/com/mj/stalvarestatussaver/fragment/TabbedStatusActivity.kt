@@ -3,6 +3,7 @@ package com.mj.stalvarestatussaver.fragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,10 +14,12 @@ import androidx.viewpager.widget.ViewPager
 import com.mj.stalvarestatussaver.R
 import com.mj.stalvarestatussaver.SharedViewModel
 import com.mj.stalvarestatussaver.Status
+import com.mj.stalvarestatussaver.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_tabbed_status.*
 import timber.log.Timber
+import tz.or.nhif.nhifauth.views.CustomToast
 
-class TabbedStatusActivity : AppCompatActivity() {
+class TabbedStatusActivity : BaseActivity() {
 
     private lateinit var context: Context
 
@@ -35,9 +38,13 @@ class TabbedStatusActivity : AppCompatActivity() {
             val status = vm.getCurrentStatus()
             try {
                 val f = status.save()
-                Toast.makeText(it.context, "Status saved at ${f.absolutePath}", Toast.LENGTH_SHORT).show();
+                CustomToast(this).text("Status saved at ${f.absolutePath}").show(true)
             } catch (e: Exception) {
-                Toast.makeText(it.context, "Could not save status ${e.message}", Toast.LENGTH_SHORT).show();
+                e.printStackTrace()
+                CustomToast(this)
+                    .type(CustomToast.Type.ERROR)
+                    .text("Could not save status ${e.message}")
+                    .show(true)
             }
         }
 
@@ -50,13 +57,7 @@ class TabbedStatusActivity : AppCompatActivity() {
 
         share.setOnClickListener {
             val status = vm.getCurrentStatus()
-            val shareIntent: Intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                setDataAndType(status.getUriToFile(context), status.getMimeType())
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-
-            context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(
+            startActivity(Intent.createChooser(status.getShareIntent(this), context.resources.getText(
                 R.string.send_to
             )))
         }
@@ -77,6 +78,8 @@ class TabbedStatusActivity : AppCompatActivity() {
             statuses.add(0, statuses.removeAt(position))
         }
 
+//        play.visibility = if (statuses[0].isVideo()) View.VISIBLE else View.GONE
+
         vm.mStatuses = statuses
 
         Timber.e("status pos: $position")
@@ -84,7 +87,6 @@ class TabbedStatusActivity : AppCompatActivity() {
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
-        viewPager.setCurrentItem(position, false)
 
     }
 
@@ -95,8 +97,7 @@ class TabbedStatusActivity : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             Timber.e("sent pos: $position")
-            val pos2 = (position + 1) % count
-            return StatusFragment2(pos2)
+            return StatusFragment2(position)
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

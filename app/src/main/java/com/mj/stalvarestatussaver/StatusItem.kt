@@ -16,6 +16,8 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import com.mj.stalvarestatussaver.utils.PaletteCache
 import com.mj.stalvarestatussaver.utils.setTransparency
 import timber.log.Timber
+import tz.or.nhif.nhifauth.views.CustomToast
+import java.io.File
 
 
 open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() {
@@ -36,6 +38,7 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
         var image: ImageView = view.findViewById(R.id.imageView)
         var save: ImageView = view.findViewById(R.id.img_save)
         var play: ImageView = view.findViewById(R.id.play)
+        var share: ImageView = view.findViewById(R.id.img_share)
 
         override fun bindView(item: StatusItem, payloads: List<Any>) {
 
@@ -44,8 +47,12 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
             play.setOnClickListener {
                 playStatus(it.context, item.status)
             }
+
             save.setOnClickListener {
                 saveStatus(it.context, item.status)
+            }
+            share.setOnClickListener {
+                shareStatus(it.context, item.status)
             }
 
             item.status.setImage(image)
@@ -70,20 +77,17 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
 
         private fun shareStatus(context: Context, status: Status) {
 
-            val shareIntent: Intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                setDataAndType(status.getUriToFile(context), status.getMimeType())
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
+            context.startActivity(Intent.createChooser(status.getShareIntent(context), context.resources.getText(R.string.send_to)))
 
-            context.startActivity(Intent.createChooser(shareIntent, context.resources.getText(R.string.send_to)))
         }
 
         private fun saveStatus(context: Context, status: Status) {
 
             try {
                 val f = status.save()
-                Toast.makeText(context, "Status saved at ${f.absolutePath}", Toast.LENGTH_SHORT).show();
+                CustomToast(context)
+                    .text("Status saved at ${f.absolutePath}")
+                    .show(true)
 
                 val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
                 mediaScanIntent.data = status.getUriToFile(context)
@@ -91,14 +95,21 @@ open class StatusItem(_status : Status) : AbstractItem<StatusItem.ViewHolder>() 
 
 
             } catch (e: Exception) {
-                Toast.makeText(context, "Could not save status: ${e.message}", Toast.LENGTH_SHORT).show();
+                CustomToast(context)
+                    .type(CustomToast.Type.ERROR)
+                    .text("Could not save status ${e.message}")
+                    .show(true)
             }
 
         }
 
         private fun playStatus(context: Context, status: Status) {
-            val intent = status.getVideoIntent(context)
-            context.startActivity(intent)
+
+           val intent = status.getVideoIntent(context)
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+            }
+
         }
 
 

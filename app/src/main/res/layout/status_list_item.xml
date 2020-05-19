@@ -6,7 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_margin="8dp"
+    android:layout_margin="@dimen/pad_icon"
     app:cardCornerRadius="16dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -45,10 +45,10 @@
             android:layout_gravity="end"
             android:textColor="#ffffff"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/img_save"
+            android:layout_toStartOf="@id/img_share"
             />
 
-
+        
         <ImageView
             android:id="@+id/img_save"
             android:layout_width="wrap_content"
@@ -57,7 +57,22 @@
             android:src="@drawable/download"
             android:layout_alignParentEnd="true"
             android:contentDescription="@string/app_name"
-            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:paddingStart="@dimen/pad_icon"
+            android:paddingEnd="@dimen/pad_icon"
+            />
+
+        <ImageView
+            android:id="@+id/img_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/share"
+            android:contentDescription="@string/app_name"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/img_save"
+            android:paddingStart="@dimen/pad_icon"
+            android:paddingEnd="@dimen/pad_icon"
             />
 
 

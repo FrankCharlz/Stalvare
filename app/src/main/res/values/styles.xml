@@ -33,19 +33,21 @@
     </style>
 
 
-    <style name="FullScreenDialog" parent="Theme.MaterialComponents.Dialog">
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowBackground">@android:color/white</item>
-        <item name="actionMenuTextColor">@color/white</item>
-    </style>
+<!--    <style name="FullScreenDialog" parent="Theme.MaterialComponents.Dialog">-->
 
-    <style name="FullScreenDialog.Animations">
-        <item name="android:windowEnterAnimation">@anim/push_up_in</item>
-        <item name="android:windowExitAnimation">@anim/push_down_out</item>
-    </style>
+<!--        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+<!--        <item name="colorAccent">@color/colorAccent</item>-->
+<!--        <item name="colorPrimary">@color/colorPrimary</item>-->
+<!--        -->
+<!--        <item name="android:windowIsFloating">false</item>-->
+<!--        <item name="android:windowBackground">@android:color/white</item>-->
+<!--        <item name="actionMenuTextColor">@color/white</item>-->
+<!--    </style>-->
+
+<!--    <style name="FullScreenDialog.Animations">-->
+<!--        <item name="android:windowEnterAnimation">@anim/push_up_in</item>-->
+<!--        <item name="android:windowExitAnimation">@anim/push_down_out</item>-->
+<!--    </style>-->
 
     <color name="white">#ffffff</color>
 </resources>

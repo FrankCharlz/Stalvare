@@ -5,5 +5,7 @@
     <color name="primaryLightColor">#000000</color>
     <color name="primaryDarkColor">#10b27c</color>
     <color name="primaryTextColor">#000000</color>
+    <color name="red">#CA2828</color>
+    <color name="brown">#F57C00</color>
 
 </resources>

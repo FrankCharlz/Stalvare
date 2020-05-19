@@ -1,5 +1,6 @@
 package com.mj.stalvarestatussaver.activities
 
+import android.Manifest
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -22,6 +23,12 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.InterstitialAd
 import com.google.android.material.snackbar.Snackbar
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mj.stalvarestatussaver.R
@@ -32,13 +39,12 @@ import com.tumblr.remember.Remember
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var mListView: RecyclerView
     private lateinit var mStatuses: List<StatusItem>
@@ -84,6 +90,33 @@ class MainActivity : AppCompatActivity() {
         mAdView.loadAd(AdRequest.Builder().build())
         loadAdInterstitial()
 
+        loadFilesWithPermission()
+    }
+
+    private fun loadFilesWithPermission() {
+
+        Dexter.withContext(this)
+            .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                    loadFiles()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?,
+                    p1: PermissionToken?
+                ) {
+                    Toast.makeText(this@MainActivity, getString(R.string.on_perm_denied), Toast.LENGTH_SHORT).show();
+                }
+
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+                    Toast.makeText(this@MainActivity, getString(R.string.on_perm_denied), Toast.LENGTH_SHORT).show();
+                }
+
+            }).check()
+    }
+
+    private fun loadFiles() {
         CoroutineScope(Dispatchers.IO).launch {
             val res = loadListOfFiles()
 
@@ -105,12 +138,10 @@ class MainActivity : AppCompatActivity() {
 
 
         }
-
-
     }
 
     private fun animate() {
-        val SPLASH_DURATION: Long = 1700L
+        val delayMillis: Long = 2000L
 
         val anim = AlphaAnimation(0.55f, 1.0f)
         anim.startOffset = 30
@@ -120,6 +151,7 @@ class MainActivity : AppCompatActivity() {
 
         Timber.e("start animation: ${System.currentTimeMillis()}")
         logo.startAnimation(anim)
+
 
         val zoom = AnimationUtils.loadAnimation(
             applicationContext,
@@ -133,7 +165,7 @@ class MainActivity : AppCompatActivity() {
             override fun onAnimationRepeat(animation: Animation?) {}
         })
 
-        placeholder_view.postDelayed({placeholder_view.startAnimation(zoom)}, SPLASH_DURATION);
+        placeholder_view.postDelayed({placeholder_view.startAnimation(zoom)}, delayMillis);
 
     }
 
@@ -178,7 +210,6 @@ class MainActivity : AppCompatActivity() {
         return Resource(statuses, null)
 
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

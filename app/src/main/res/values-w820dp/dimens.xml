@@ -9,6 +9,8 @@
     <dimen name="ribbon_padding">24dp</dimen>
 
     <dimen name="action_play_size">200dp</dimen>
+    <dimen name="pad_icon">24dp</dimen>
+
 
 </resources>
 

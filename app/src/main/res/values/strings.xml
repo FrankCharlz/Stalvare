@@ -30,6 +30,7 @@
     <string name="permission_camera_denied">NEVER ASK</string>
     <string name="permission_camera_never_askagain">NEVER ASK</string>
     <string name="signature2">Status Saver \nby laudix tech</string>
+    <string name="on_perm_denied">The app cant work without requested permissions</string>
 
 
     <!--
